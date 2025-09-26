@@ -584,6 +584,14 @@
   </section>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { getProductsAction } from '@/modules/products/actions'
+import { useQuery } from '@tanstack/vue-query'
+
+const { data: product, isLoading } = useQuery({
+  queryKey: ['products', { page: 1 }],
+  queryFn: () => getProductsAction(),
+})
+</script>
 
 <style scoped></style>
