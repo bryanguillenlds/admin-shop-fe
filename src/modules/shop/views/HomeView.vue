@@ -96,19 +96,36 @@
 
 <script setup lang="ts">
 import { getProductsAction } from '@/modules/products/actions'
-import { useQuery } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useRoute } from 'vue-router';
 import ProductList from '@/modules/products/components/ProductList.vue'
 import ButtonPagination from '@/modules/common/components/ButtonPagination.vue';
-import { computed } from 'vue';
+import { computed, watch, watchEffect } from 'vue';
 
 const route = useRoute();
+const queryClient = useQueryClient();
 const page = computed(() => route.query.page ? Number(route.query.page) : 1);
 
 const { data: products } = useQuery({
   queryKey: ['products', { page }],
   queryFn: () => getProductsAction(page.value),
 })
+
+// Watch for page changes and scroll to top smoothly
+watch(page, () => {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+});
+
+// Watching for the page to prefetch the next page
+watchEffect(() => {
+  queryClient.prefetchQuery({
+    queryKey: ['products', { page: page.value + 1 }],
+    queryFn: () => getProductsAction(page.value + 1),
+  });
+});
 </script>
 
 <style scoped></style>
