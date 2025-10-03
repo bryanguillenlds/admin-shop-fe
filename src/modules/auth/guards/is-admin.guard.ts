@@ -1,7 +1,7 @@
 import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router';
 import { useAuthStore } from '../stores/auth/auth.store';
 
-const isAuthenticatedGuard = async (
+const isAdminGuard = async (
   to: RouteLocationNormalized,
   from: RouteLocationNormalized,
   next: NavigationGuardNext,
@@ -19,4 +19,4 @@ const isAuthenticatedGuard = async (
   return next();
 };
 
-export default isAuthenticatedGuard;
+export default isAdminGuard;
