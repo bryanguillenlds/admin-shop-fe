@@ -1,7 +1,7 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { AuthStatus, type User } from '@/modules/auth/interfaces';
-import { loginAction, registerAction } from '../../actions';
+import { checkAuthAction, loginAction, registerAction } from '../../actions';
 import { useLocalStorage } from '@vueuse/core';
 
 
@@ -41,6 +41,28 @@ export const useAuthStore = defineStore('auth', () => {
     }
   };
 
+  const checkAuthStatus = async (): Promise<boolean> => {
+    try {
+      const statusResponse = await checkAuthAction();
+
+      if(!statusResponse.ok) {
+        logout();
+
+        return false;
+      }
+
+      user.value = statusResponse.user;
+      token.value = statusResponse.token;
+      authStatus.value = AuthStatus.AUTHENTICATED;
+
+      return true;
+    } catch (error) {
+      console.error(error);
+
+      return false;
+    }
+  }
+
   const login = async (email: string, password: string) => {
     try {
       const loginResponse = await loginAction(email, password);
@@ -64,6 +86,8 @@ export const useAuthStore = defineStore('auth', () => {
   };
 
   const logout = () => {
+    localStorage.removeItem('token');
+
     user.value = undefined;
     token.value = '';
     authStatus.value = AuthStatus.UNAUTHENTICATED;
@@ -79,12 +103,14 @@ export const useAuthStore = defineStore('auth', () => {
     //Getters
     isChecking: computed(() => authStatus.value === AuthStatus.CHECKING),
     isAuthenticated: computed(() => authStatus.value === AuthStatus.AUTHENTICATED),
-
+    isNotAuthenticated: computed(() => authStatus.value === AuthStatus.UNAUTHENTICATED),
+    isAdmin: computed(() => user.value?.roles.includes('admin')),
     username: computed(() => user.value?.fullName),
 
     //Actions
     register,
     login,
     logout,
+    checkAuthStatus,
    }
 })

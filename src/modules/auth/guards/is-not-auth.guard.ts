@@ -1,7 +1,7 @@
 import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router';
 import { useAuthStore } from '../stores/auth/auth.store';
 
-const isAuthenticatedGuard = async (
+const isNotAuthenticatedGuard = async (
   to: RouteLocationNormalized,
   from: RouteLocationNormalized,
   next: NavigationGuardNext,
@@ -10,7 +10,7 @@ const isAuthenticatedGuard = async (
 
   await authStore.checkAuthStatus();
 
-  if (authStore.isNotAuthenticated) {
+  if (authStore.isAuthenticated) {
     return next({
       name: 'home',
     });
@@ -19,4 +19,4 @@ const isAuthenticatedGuard = async (
   return next();
 };
 
-export default isAuthenticatedGuard;
+export default isNotAuthenticatedGuard;
