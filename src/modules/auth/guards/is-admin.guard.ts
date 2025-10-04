@@ -10,7 +10,7 @@ const isAdminGuard = async (
 
   await authStore.checkAuthStatus();
 
-  if (authStore.isNotAuthenticated) {
+  if (!authStore.isAdmin) {
     return next({
       name: 'home',
     });
