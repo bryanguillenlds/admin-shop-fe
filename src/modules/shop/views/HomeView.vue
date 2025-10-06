@@ -91,32 +91,27 @@
 
   <ProductList v-else :products="products" />
 
-  <ButtonPagination :page="page" :isFirstPage="page === 1" :isLastPage="!!products && products.length < 10" />
+  <ButtonPagination
+    :page="page"
+    :isFirstPage="page === 1"
+    :isLastPage="!!products && products.length < 10"
+  />
 </template>
 
 <script setup lang="ts">
-import { getProductsAction } from '@/modules/products/actions'
-import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { useRoute } from 'vue-router';
-import ProductList from '@/modules/products/components/ProductList.vue'
+import { getProductsAction } from '@/modules/products/actions';
+import { useQuery, useQueryClient } from '@tanstack/vue-query';
+import { watchEffect } from 'vue';
+import ProductList from '@/modules/products/components/ProductList.vue';
 import ButtonPagination from '@/modules/common/components/ButtonPagination.vue';
-import { computed, watch, watchEffect } from 'vue';
+import { usePagination } from '@/modules/common/composables/usePagination';
 
-const route = useRoute();
 const queryClient = useQueryClient();
-const page = computed(() => route.query.page ? Number(route.query.page) : 1);
+const { page } = usePagination();
 
 const { data: products } = useQuery({
   queryKey: ['products', { page }],
   queryFn: () => getProductsAction(page.value),
-})
-
-// Watch for page changes and scroll to top smoothly
-watch(page, () => {
-  window.scrollTo({
-    top: 0,
-    behavior: 'smooth'
-  });
 });
 
 // Watching for the page to prefetch the next page
