@@ -4,36 +4,43 @@
     <hr class="my-4" />
   </div>
 
-  <form class="grid grid-cols-1 sm:grid-cols-2 bg-white px-5 gap-5">
+  <form class="grid grid-cols-1 sm:grid-cols-2 bg-white px-5 gap-5" @submit.prevent="onSubmit">
     <div class="first-col">
       <!-- Primera parte del formulario -->
       <div class="mb-4">
         <label for="title" class="form-label">Title</label>
-        <input type="text" id="title" class="form-control" />
+        <CustomInput v-model="title" v-bind="titleAttrs" type="text" :error="errors.title" />
       </div>
 
       <div class="mb-4">
         <label for="slug" class="form-label">Slug</label>
-        <input type="text" id="slug" class="form-control" />
+        <CustomInput v-model="slug" v-bind="slugAttrs" type="text" :error="errors.slug" />
       </div>
 
       <div class="mb-4">
         <label for="description" class="form-label">Description</label>
-        <textarea
-          id="description"
-          class="shadow h-32 appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-        ></textarea>
+        <CustomTextArea
+          v-model="description"
+          v-bind="descriptionAttrs"
+          type="text"
+          :error="errors.description"
+        />
       </div>
 
       <div class="flex flex-row gap-3">
         <div class="mb-4">
           <label for="price" class="form-label">Price</label>
-          <input type="number" id="price" class="form-control" />
+          <CustomInput
+            v-model.number="price"
+            v-bind="priceAttrs"
+            type="number"
+            :error="errors.price"
+          />
         </div>
 
         <div class="mb-4">
           <label for="stock" class="form-label">Inventory</label>
-          <input type="number" id="stock" class="form-control" />
+          <CustomInput v-model="stock" v-bind="stockAttrs" type="number" :error="errors.stock" />
         </div>
       </div>
 
@@ -93,6 +100,15 @@
       </div>
     </div>
   </form>
+
+  <div class="grid grid-cols-2 gap-4 mt-2">
+    <div class="col-span-1 bg-blue-500">
+      {{ values }}
+    </div>
+    <div class="col-span-1 bg-red-500">
+      {{ errors }}
+    </div>
+  </div>
 </template>
 
 <script src="./ProductDetailView.ts" lang="ts"></script>
@@ -102,8 +118,5 @@
 
 .form-label {
   @apply block text-gray-700 text-sm font-bold mb-2;
-}
-.form-control {
-  @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none;
 }
 </style>
