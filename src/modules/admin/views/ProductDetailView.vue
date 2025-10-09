@@ -50,6 +50,7 @@
           <button
             v-for="size in allSizes"
             :key="size"
+            @click="toggleSize(size)"
             type="button"
             class="bg-blue-100 p-2 rounded w-14 mr-2 flex-1"
           >
@@ -64,12 +65,8 @@
       <label for="stock" class="form-label">Images</label>
       <!-- Row with scrollable horizontal -->
       <div class="flex p-2 overflow-x-auto space-x-8 w-full h-[265px] bg-gray-200 rounded">
-        <div class="flex-shrink-0">
-          <img src="https://via.placeholder.com/250" alt="imagen" class="w-[250px] h-[250px]" />
-        </div>
-
-        <div class="flex-shrink-0">
-          <img src="https://via.placeholder.com/250" alt="imagen" class="w-[250px] h-[250px]" />
+        <div v-for="image in images" :key="image.value" class="flex-shrink-0">
+          <img :src="image.value" :alt="title" class="w-[250px] h-[250px]" />
         </div>
       </div>
       <!-- Upload image -->
@@ -81,12 +78,13 @@
 
       <div class="mb-4">
         <label for="stock" class="form-label">Gender</label>
-        <select class="form-control">
+        <select v-model="gender" v-bind="genderAttrs" class="form-control">
           <option value="">Select</option>
           <option value="kid">Kid</option>
           <option value="women">Woman</option>
           <option value="men">Man</option>
         </select>
+        <span v-if="errors.gender" class="text-red-500">{{ errors.gender }}</span>
       </div>
 
       <!-- Botón para guardar -->
@@ -101,13 +99,13 @@
     </div>
   </form>
 
-  <div class="grid grid-cols-2 gap-4 mt-2">
-    <div class="col-span-1 bg-blue-500">
-      {{ values }}
-    </div>
-    <div class="col-span-1 bg-red-500">
-      {{ errors }}
-    </div>
+  <div class="grid grid-cols-2 mt-2">
+    <pre class="bg-blue-500 p-2">
+      {{ JSON.stringify(values, null, 2) }}
+    </pre>
+    <pre class="bg-red-500 p-2">
+      {{ JSON.stringify(errors, null, 2) }}
+    </pre>
   </div>
 </template>
 
