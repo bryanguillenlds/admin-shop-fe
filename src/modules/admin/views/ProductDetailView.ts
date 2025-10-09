@@ -1,9 +1,9 @@
 import { defineComponent } from 'vue';
 import { useQuery } from '@tanstack/vue-query';
 import { getProductById } from '@/modules/products/actions';
-import { watchEffect } from 'vue';
+import { watchEffect, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { useForm } from 'vee-validate';
+import { useForm, useFieldArray } from 'vee-validate';
 import * as yup from 'yup';
 
 import CustomInput from '@/modules/common/components/CustomInput.vue';
@@ -37,24 +37,6 @@ export default defineComponent({
   setup(props) {
     const router = useRouter();
 
-    const { values, defineField, errors, handleSubmit } = useForm({
-      validationSchema,
-    });
-
-    const [title, titleAttrs] = defineField('title');
-    const [slug, slugAttrs] = defineField('slug');
-    const [description, descriptionAttrs] = defineField('description');
-    const [price, priceAttrs] = defineField('price');
-    const [stock, stockAttrs] = defineField('stock');
-    const [gender, genderAttrs] = defineField('gender');
-    const [tags, tagsAttrs] = defineField('tags');
-    // const [images, imagesAttrs] = defineField('images');
-    // const [sizes, sizesAttrs] = defineField('sizes');
-
-    const onSubmit = handleSubmit((values) => {
-      console.log('values', values);
-    });
-
     const {
       data: product,
       isLoading,
@@ -65,11 +47,56 @@ export default defineComponent({
       retry: false,
     });
 
+    const { values, defineField, errors, handleSubmit, resetForm } = useForm({
+      validationSchema,
+      initialValues: product.value,
+    });
+
+    const [title, titleAttrs] = defineField('title');
+    const [slug, slugAttrs] = defineField('slug');
+    const [description, descriptionAttrs] = defineField('description');
+    const [price, priceAttrs] = defineField('price');
+    const [stock, stockAttrs] = defineField('stock');
+    const [gender, genderAttrs] = defineField('gender');
+    const [tags, tagsAttrs] = defineField('tags');
+
+    const { fields: images } = useFieldArray<string>('images');
+    const { fields: sizes, remove: removeSize, push: pushSize } = useFieldArray<string>('sizes');
+
+    const onSubmit = handleSubmit((values) => {
+      console.log('values', values);
+    });
+
+    const toggleSize = (size: string) => {
+      // Get current selected sizes from form field selectors
+      const currentSizes = sizes.value.map((s) => s.value);
+
+      // If size is already selected, remove it (toogle it)
+      if (currentSizes.includes(size)) {
+        removeSize(currentSizes.indexOf(size));
+      } else {
+        // If size is not selected, add it
+        pushSize(size);
+      }
+    };
+
     watchEffect(() => {
       if (isError.value && isLoading.value) {
         router.replace('/admin/products');
       }
     });
+
+    watch(
+      product,
+      () => {
+        if (!product) return;
+
+        resetForm({
+          values: product.value,
+        });
+      },
+      { deep: true, immediate: true }
+    );
 
     return {
       //Props
@@ -93,11 +120,15 @@ export default defineComponent({
       tags,
       tagsAttrs,
 
+      images,
+      sizes,
+
       //Getters
       allSizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
 
       //Actions
       onSubmit,
+      toggleSize,
     };
   },
 });
