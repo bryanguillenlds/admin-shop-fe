@@ -3,6 +3,7 @@
     <textarea
       :value="modelValue"
       :type="type"
+      rows="5"
       @input="$emit('update:modelValue', ($event.target as HTMLTextAreaElement)?.value ?? '')"
       @blur="$emit('blur')"
       :class="['form-control', { 'border-red-500': error }]"

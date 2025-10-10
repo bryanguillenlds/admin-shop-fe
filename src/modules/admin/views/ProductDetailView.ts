@@ -47,7 +47,7 @@ export default defineComponent({
       retry: false,
     });
 
-    const { values, defineField, errors, handleSubmit, resetForm } = useForm({
+    const { values, defineField, errors, handleSubmit, resetForm, meta } = useForm({
       validationSchema,
       initialValues: product.value,
     });
@@ -80,6 +80,12 @@ export default defineComponent({
       }
     };
 
+    const hasSize = (size: string) => {
+      const currentSizes = sizes.value.map((s) => s.value);
+
+      return currentSizes.includes(size);
+    };
+
     watchEffect(() => {
       if (isError.value && isLoading.value) {
         router.replace('/admin/products');
@@ -105,6 +111,8 @@ export default defineComponent({
       // Form fields
       values,
       errors,
+      meta,
+
       title,
       titleAttrs,
       slug,
@@ -129,6 +137,7 @@ export default defineComponent({
       //Actions
       onSubmit,
       toggleSize,
+      hasSize,
     };
   },
 });
