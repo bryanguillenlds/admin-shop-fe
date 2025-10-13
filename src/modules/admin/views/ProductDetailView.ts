@@ -18,6 +18,8 @@ const validationSchema = yup.object({
   stock: yup.number().min(1).required('Stock is required'),
   gender: yup.string().required('Gender is required').oneOf(['kid', 'women', 'men']),
   tags: yup.array().of(yup.string()).required('Tags are required'),
+  images: yup.array().of(yup.string()).default([]),
+  sizes: yup.array().of(yup.string()).default([]),
 });
 
 export default defineComponent({
@@ -43,6 +45,7 @@ export default defineComponent({
       data: product,
       isLoading,
       isError,
+      refetch,
     } = useQuery({
       queryKey: ['product', props.productId],
       queryFn: () => getProductById(props.productId),
@@ -60,7 +63,7 @@ export default defineComponent({
 
     const { values, defineField, errors, handleSubmit, resetForm, meta } = useForm({
       validationSchema,
-      initialValues: product.value,
+      initialValues: product.value as any, //eslint-disable-line
     });
 
     const [title, titleAttrs] = defineField('title');
@@ -109,7 +112,7 @@ export default defineComponent({
         if (!product) return;
 
         resetForm({
-          values: product.value,
+          values: product.value as any, //eslint-disable-line
         });
       },
       { deep: true, immediate: true }
@@ -120,10 +123,24 @@ export default defineComponent({
 
       toast.success('Product updated successfully');
 
+      router.replace(`/admin/products/${updatedProduct.value?.id}`);
+
       resetForm({
         values: updatedProduct.value ?? {},
       });
     });
+
+    // Watching the url for changes in the productId (or create)
+    // because they id may have changed but the product values may not have been updated yet
+    // During that delay, (tanstack updating the product after the url has already changed)
+    // we may have stale data in the form, so we need to refetch the product data manually as soon
+    // as the url has changed. (the watcher for product will react and populate the form)
+    watch(
+      () => props.productId,
+      () => {
+        refetch();
+      }
+    );
 
     return {
       //Props
