@@ -81,7 +81,7 @@
       <div class="col-span-2 my-2">
         <label for="image" class="form-label">Upload image</label>
 
-        <input multiple type="file" id="image" class="form-control" />
+        <input multiple type="file" id="image" class="form-control file-input" />
       </div>
 
       <div class="mb-4">
@@ -98,8 +98,9 @@
       <!-- Botón para guardar -->
       <div class="my-4 text-right">
         <button
+          :disabled="isPending"
           type="submit"
-          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          class="disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-300 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >
           Save
         </button>
@@ -127,6 +128,10 @@
 
 .form-control {
   @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none;
+
+  &.file-input {
+    @apply file:px-4 file:rounded-md file:text-sm file:font-semibold file:bg-blue-100 hover:file:bg-blue-100;
+  }
 }
 
 .form-label {

@@ -1,9 +1,10 @@
 import { defineComponent } from 'vue';
-import { useQuery } from '@tanstack/vue-query';
-import { getProductById } from '@/modules/products/actions';
+import { useMutation, useQuery } from '@tanstack/vue-query';
+import { createUpdateProductAction, getProductById } from '@/modules/products/actions';
 import { watchEffect, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useForm, useFieldArray } from 'vee-validate';
+import { useToast } from 'vue-toastification';
 import * as yup from 'yup';
 
 import CustomInput from '@/modules/common/components/CustomInput.vue';
@@ -36,6 +37,7 @@ export default defineComponent({
 
   setup(props) {
     const router = useRouter();
+    const toast = useToast();
 
     const {
       data: product,
@@ -45,6 +47,15 @@ export default defineComponent({
       queryKey: ['product', props.productId],
       queryFn: () => getProductById(props.productId),
       retry: false,
+    });
+
+    const {
+      mutate,
+      isPending,
+      isSuccess: isUpdateSuccess,
+      data: updatedProduct,
+    } = useMutation({
+      mutationFn: createUpdateProductAction,
     });
 
     const { values, defineField, errors, handleSubmit, resetForm, meta } = useForm({
@@ -64,7 +75,7 @@ export default defineComponent({
     const { fields: sizes, remove: removeSize, push: pushSize } = useFieldArray<string>('sizes');
 
     const onSubmit = handleSubmit((values) => {
-      console.log('values', values);
+      mutate(values);
     });
 
     const toggleSize = (size: string) => {
@@ -104,9 +115,20 @@ export default defineComponent({
       { deep: true, immediate: true }
     );
 
+    watch(isUpdateSuccess, (value) => {
+      if (!value) return;
+
+      toast.success('Product updated successfully');
+
+      resetForm({
+        values: updatedProduct.value ?? {},
+      });
+    });
+
     return {
       //Props
       product,
+      isPending,
 
       // Form fields
       values,
