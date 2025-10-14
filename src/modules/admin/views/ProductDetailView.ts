@@ -1,7 +1,7 @@
 import { defineComponent } from 'vue';
 import { useMutation, useQuery } from '@tanstack/vue-query';
 import { createUpdateProductAction, getProductById } from '@/modules/products/actions';
-import { watchEffect, watch } from 'vue';
+import { watchEffect, watch, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useForm, useFieldArray } from 'vee-validate';
 import { useToast } from 'vue-toastification';
@@ -77,6 +77,8 @@ export default defineComponent({
     const { fields: images } = useFieldArray<string>('images');
     const { fields: sizes, remove: removeSize, push: pushSize } = useFieldArray<string>('sizes');
 
+    const imageFiles = ref<File[]>([]);
+
     const onSubmit = handleSubmit((values) => {
       mutate(values);
     });
@@ -94,10 +96,21 @@ export default defineComponent({
       }
     };
 
+    const onFileChange = (event: Event) => {
+      const fileList = (event.target as HTMLInputElement).files;
+      if (!fileList || fileList.length === 0) return;
+
+      imageFiles.value = Array.from(fileList);
+    };
+
     const hasSize = (size: string) => {
       const currentSizes = sizes.value.map((s) => s.value);
 
       return currentSizes.includes(size);
+    };
+
+    const tempImageUrl = (file: File) => {
+      return URL.createObjectURL(file);
     };
 
     watchEffect(() => {
@@ -170,6 +183,9 @@ export default defineComponent({
       images,
       sizes,
 
+      imageFiles,
+      tempImageUrl,
+
       //Getters
       allSizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
 
@@ -177,6 +193,7 @@ export default defineComponent({
       onSubmit,
       toggleSize,
       hasSize,
+      onFileChange,
     };
   },
 });

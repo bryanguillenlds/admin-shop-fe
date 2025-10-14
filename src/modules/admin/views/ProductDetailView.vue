@@ -76,12 +76,22 @@
         <div v-for="image in images" :key="image.value" class="flex-shrink-0">
           <img :src="image.value" :alt="title" class="w-[250px] h-[250px]" />
         </div>
+        <div v-for="imageFile in imageFiles" :key="imageFile.name" class="flex-shrink-0">
+          <img :src="tempImageUrl(imageFile)" class="w-[250px] h-[250px]" />
+        </div>
       </div>
       <!-- Upload image -->
       <div class="col-span-2 my-2">
         <label for="image" class="form-label">Upload image</label>
 
-        <input multiple type="file" id="image" class="form-control file-input" />
+        <input
+          multiple
+          type="file"
+          id="image"
+          class="form-control file-input"
+          accept="image/*"
+          @change="onFileChange"
+        />
       </div>
 
       <div class="mb-4">

@@ -11,26 +11,31 @@ export const createUpdateProductAction = async (product: Partial<Product>) => {
   }
 };
 
-const updateProduct = async (product: Partial<Product>) => {
+const prepareProductPayload = (product: Partial<Product>) => {
   const images: string[] =
     product.images?.map((image) => {
       if (image.startsWith('http')) {
         const imageName = image.split('/').pop();
-
         return imageName ? imageName : '';
       }
 
       return image;
     }) ?? [];
 
-  //Extract id to send in url (but removing from product object so it isn't sent in the body for security)
-  const productId = product.id;
+  //Removing from product object so it isn't sent in the body for security
   delete product.id;
   delete product.user;
   product.images = images;
 
+  return product;
+};
+
+const updateProduct = async (product: Partial<Product>) => {
+  const productId = product.id;
+  const productPayload = prepareProductPayload(product);
+
   try {
-    const { data } = await tesloApi.patch(`/products/${productId}`, product);
+    const { data } = await tesloApi.patch(`/products/${productId}`, productPayload);
 
     return data;
   } catch (error) {
@@ -40,28 +45,31 @@ const updateProduct = async (product: Partial<Product>) => {
 };
 
 const createProduct = async (product: Partial<Product>) => {
-  const images: string[] =
-    product.images?.map((image) => {
-      if (image.startsWith('http')) {
-        const imageName = image.split('/').pop();
-
-        return imageName ? imageName : '';
-      }
-
-      return image;
-    }) ?? [];
-
-  //Removing id and user from product object so it isn't sent in the body for security
-  delete product.id;
-  delete product.user;
-  product.images = images;
+  const productPayload = prepareProductPayload(product);
 
   try {
-    const { data } = await tesloApi.post(`/products`, product);
+    const { data } = await tesloApi.post(`/products`, productPayload);
 
     return data;
   } catch (error) {
     console.error(error);
     throw new Error('Failed to create product');
+  }
+};
+
+const uploadImages = async (imageFiles: (string | File)[]) => {
+  const formData = new FormData();
+
+  imageFiles.forEach((imageFile) => {
+    formData.append('file', imageFile);
+  });
+
+  try {
+    const { data } = await tesloApi.post<{ secureUrl: string }>(`/files/product`, formData);
+
+    return data.secureUrl;
+  } catch (error) {
+    console.error(error);
+    throw new Error('Failed to upload images');
   }
 };
