@@ -118,7 +118,7 @@
     </div>
   </form>
 
-  <div class="grid grid-cols-2 mt-2">
+  <!-- <div class="grid grid-cols-2 mt-2">
     <pre class="bg-blue-500 p-2">
       {{ JSON.stringify(values, null, 2) }}
     </pre>
@@ -128,7 +128,7 @@
     <pre class="bg-green-500 p-2 col-span-2">
       {{ JSON.stringify(meta, null, 2) }}
     </pre>
-  </div>
+  </div> -->
 </template>
 
 <script src="./ProductDetailView.ts" lang="ts"></script>

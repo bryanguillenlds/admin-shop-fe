@@ -80,7 +80,12 @@ export default defineComponent({
     const imageFiles = ref<File[]>([]);
 
     const onSubmit = handleSubmit((values) => {
-      mutate(values);
+      const productFormValues = {
+        ...values,
+        images: [...values.images, ...imageFiles.value],
+      };
+
+      mutate(productFormValues); // Calls createUpdateProductAction action
     });
 
     const toggleSize = (size: string) => {
@@ -141,6 +146,8 @@ export default defineComponent({
       resetForm({
         values: updatedProduct.value ?? {},
       });
+
+      imageFiles.value = [];
     });
 
     // Watching the url for changes in the productId (or create)
