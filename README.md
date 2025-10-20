@@ -1,6 +1,4 @@
-# admin-shop
-
-Steps for Dev:
+## Steps for Dev:
 
 1. Clone Repo
 2. Install dependencies
