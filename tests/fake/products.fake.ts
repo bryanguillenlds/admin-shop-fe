@@ -10,7 +10,7 @@ export const fakeProducts = [
     sizes: ['XS', 'S', 'L', 'XL', 'XXL'],
     gender: 'men',
     tags: ['sweatshirt'],
-    images: ['1740176-00-A_0_2000.jpg', '1740176-00-A_1.jpg'],
+    images: ['t-shirt.jpg'],
     user: {
       id: '568bea9d-66a6-4800-8823-c0fa02d95284',
       email: 'test1@google.com',
