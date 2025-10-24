@@ -119,8 +119,9 @@ export default defineComponent({
     };
 
     watchEffect(() => {
-      if (isError.value && isLoading.value) {
+      if (isError.value && !isLoading.value) {
         router.replace('/admin/products');
+        return;
       }
     });
 
